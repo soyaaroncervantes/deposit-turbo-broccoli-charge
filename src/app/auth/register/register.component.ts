@@ -9,7 +9,9 @@ export class RegisterComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-  }
+  ngOnInit() { }
 
+  onSubmit( value ) {
+    console.log( value );
+  }
 }
