@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "ingreso-egreso-ac418": {
+      "hosting": {
+        "ingreso-egreso-app": [
+          "ingreso-egreso-ac418"
+        ]
+      }
+    }
+  }
+}
