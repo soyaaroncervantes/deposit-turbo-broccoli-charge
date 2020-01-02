@@ -6,14 +6,10 @@ export class UserModel implements UserInterface {
   name: string;
   uid: string;
 
-  constructor(
-    email: string,
-    name: string,
-    uid: string
-  ) {
-    this.email = email;
-    this.name = name;
-    this.uid = uid;
+  constructor( user: UserInterface ) {
+    this.email = user && user.email || null;
+    this.name = user && user.name || null;
+    this.uid = user && user.uid || null;
   }
 
 

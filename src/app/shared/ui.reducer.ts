@@ -1,14 +1,26 @@
-import {Action} from '@ngrx/store';
+import * as fromUI from './ui.actions';
 
-export const ACTIVAR_LOADING = '[ UI LOADING ] Cargando...';
-export const DESACTIVAR_LOADING = '[ UI LOADING ] Fin de carga.';
-
-export class ActivarLoadingAction implements Action {
-  readonly type: string = ACTIVAR_LOADING;
+export interface State {
+  isLoading: boolean;
 }
 
-export class DesactivarLoadingAction implements Action {
-  readonly type: string = DESACTIVAR_LOADING;
-}
+const initState: State = {
+  isLoading: false
+};
 
-export type acciones = ActivarLoadingAction | DesactivarLoadingAction;
+export function uiReducer( state = initState, action: fromUI.acciones ): State {
+
+  switch ( action.type ) {
+
+    case fromUI.ACTIVAR_LOADING:
+      return { isLoading: true };
+
+    case fromUI.DESACTIVAR_LOADING:
+      return { isLoading: false };
+
+    default:
+      return state;
+
+  }
+
+}

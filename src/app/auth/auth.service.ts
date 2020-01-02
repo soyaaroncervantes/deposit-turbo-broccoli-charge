@@ -11,27 +11,55 @@ import Swal from 'sweetalert2';
 import {map} from 'rxjs/operators';
 
 import {UserModel} from '../model/user.model';
-import {ActivarLoadingAction, DesactivarLoadingAction} from '../shared/ui.reducer';
+import {ActivarLoadingAction, DesactivarLoadingAction} from '../shared/ui.actions';
 
 import {AuthInterface} from '../interfaces/auth.interface';
 import {AppState} from '../app.reducer';
+import {UserInterface} from '../interfaces/user.interface';
+import {SetUserAction} from './auth.actions';
+import {Subscription} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
+  private subscription: Subscription;
+
   constructor(
     private angularFireAuth: AngularFireAuth,
     private angularFirestore: AngularFirestore,
     private router: Router,
     private store: Store<AppState>
-  ) { }
+  ) {
+    this.subscription = new Subscription();
+  }
 
   initAuthListener() {
 
-    this.angularFireAuth.authState.subscribe( (value: firebase.User ) => {
-      console.log('%c [ USER - Service ] value', 'color: aqua', value );
+    this.angularFireAuth.authState.subscribe( (user: firebase.User ) => {
+
+      if ( user ) {
+
+        this.subscription = this.angularFirestore
+          .doc<UserInterface>(`${ user.uid }/user`)
+          .valueChanges()
+          .subscribe( (value: UserInterface) => {
+
+            console.log('%c [ USER - Service ] value', 'color: aqua', value );
+
+            const user = new UserModel( value );
+
+            this.store.dispatch( new SetUserAction( user ) );
+
+          });
+
+      } else {
+
+        this.subscription.unsubscribe();
+
+      }
+
     });
 
   }
