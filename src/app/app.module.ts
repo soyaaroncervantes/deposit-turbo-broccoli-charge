@@ -13,6 +13,10 @@ import { FooterComponent } from './shared/footer/footer.component';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
 import {FormsModule} from '@angular/forms';
+import {AngularFireModule} from '@angular/fire';
+import {environment} from '../environments/environment';
+import {AngularFireAuth, AngularFireAuthModule} from '@angular/fire/auth';
+import {AngularFirestoreModule} from '@angular/fire/firestore';
 
 @NgModule({
   declarations: [
@@ -28,9 +32,12 @@ import {FormsModule} from '@angular/forms';
     SidebarComponent
   ],
   imports: [
+    AngularFireModule.initializeApp( environment.firebaseConfig ),
+    AngularFireAuthModule,
+    AngularFirestoreModule,
+    AppRoutingModule,
     BrowserModule,
-    FormsModule,
-    AppRoutingModule
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
