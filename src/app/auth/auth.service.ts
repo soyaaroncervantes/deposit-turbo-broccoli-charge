@@ -1,11 +1,20 @@
 import { Injectable } from '@angular/core';
-import {AuthInterface} from '../interfaces/auth.interface';
-import {AngularFireAuth} from '@angular/fire/auth';
 import {Router} from '@angular/router';
-import Swal from 'sweetalert2';
-import {map} from 'rxjs/operators';
-import {UserModel} from '../model/user.model';
+
+import {AngularFireAuth} from '@angular/fire/auth';
 import {AngularFirestore} from '@angular/fire/firestore';
+
+import {Store} from '@ngrx/store';
+
+import Swal from 'sweetalert2';
+
+import {map} from 'rxjs/operators';
+
+import {UserModel} from '../model/user.model';
+import {ActivarLoadingAction, DesactivarLoadingAction} from '../shared/ui.reducer';
+
+import {AuthInterface} from '../interfaces/auth.interface';
+import {AppState} from '../app.reducer';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +25,7 @@ export class AuthService {
     private angularFireAuth: AngularFireAuth,
     private angularFirestore: AngularFirestore,
     private router: Router,
+    private store: Store<AppState>
   ) { }
 
   initAuthListener() {
@@ -46,9 +56,12 @@ export class AuthService {
 
   createUser( user: AuthInterface ) {
 
+    this.store.dispatch( new ActivarLoadingAction() );
+
     this.angularFireAuth.auth
       .createUserWithEmailAndPassword( user.email, user.password )
       .then( value => {
+
 
         // console.log('%c [ REGISTER - Service ] value', 'color: lightcoral', value );
 
@@ -61,13 +74,16 @@ export class AuthService {
         this.angularFirestore
           .doc(`${ userModel.uid }/user`)
           .set( userModel )
-          .then( () => this.router.navigate(['/dashboard']) );
+          .then( () => {
+            this.router.navigate(['/dashboard']).then();
+            this.store.dispatch( new DesactivarLoadingAction() );
+          });
 
       })
 
       .catch( reason => {
 
-        // console.warn('[ REGISTER - Service ] Error : ', reason);
+        console.warn('[ REGISTER - Service ] Error : ', reason);
 
         Swal.fire({
           title: 'Error en el registro',
@@ -75,11 +91,15 @@ export class AuthService {
           text: reason.message
         });
 
+        this.store.dispatch( new DesactivarLoadingAction() );
+
       });
 
   }
 
   loginUser( user: AuthInterface ) {
+
+    this.store.dispatch( new ActivarLoadingAction() );
 
     this.angularFireAuth.auth.signInWithEmailAndPassword( user.email, user.password )
       .then( value => {
@@ -88,11 +108,15 @@ export class AuthService {
 
         this.router.navigate(['/dashboard']).then();
 
+        this.store.dispatch( new DesactivarLoadingAction() );
+
       })
 
       .catch( reason => {
 
         // console.warn('[ LOGIN - Service ] Error: ', reason);
+
+        this.store.dispatch( new DesactivarLoadingAction() );
 
         Swal.fire({
           title: 'Error en el login',
